@@ -1,18 +1,25 @@
-FROM centos:8-stream
-MAINTAINER viren.lahamage@gmail.com
-RUN cd /etc/yum.repos.d/
-RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
-RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
-RUN yum -y install java
-CMD /bin/bash
-RUN yum install -y httpd
-RUN yum install -y zip
-RUN yum install -y unzip
-ADD https://www.free-css.com/assets/files/free-css-templates/download/page254/photogenic.zip /var/www/html/
+# Use a modern, supported base image
+FROM almalinux:9
+
+MAINTAINER virenlahamage2020@gmail.com
+
+# Install required packages
+RUN dnf -y update && \
+    dnf install -y java httpd zip unzip curl && \
+    dnf clean all
+
+# Set working directory for web files
 WORKDIR /var/www/html/
-RUN sh -c 'unzip -q "*.zip"'
-RUN cp -rvf photogenic/* .
-RUN rm -rf photogenic photogenic.zip
+
+# Download and extract the template
+RUN curl -fSL https://www.free-css.com/assets/files/free-css-templates/download/page254/photogenic.zip -o photogenic.zip && \
+    unzip -q photogenic.zip && \
+    cp -rvf photogenic/* . && \
+    rm -rf photogenic photogenic.zip
+
+# Expose ports
+EXPOSE 80
+
+# Start Apache in foreground
 CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
-EXPOSE 80 22
 
