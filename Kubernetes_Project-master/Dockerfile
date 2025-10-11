@@ -1,4 +1,4 @@
-FROM centos:9-stream
+FROM centos:8-stream
 MAINTAINER viren.lahamage@gmail.com
 RUN cd /etc/yum.repos.d/
 RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
