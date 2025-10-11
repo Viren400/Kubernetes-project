@@ -1,25 +1,19 @@
-# Use a modern, supported base image
+# Simple base image
 FROM almalinux:9
 
+# Maintainer info
 MAINTAINER virenlahamage2020@gmail.com
 
-# Install required packages
-RUN dnf -y update && \
-    dnf install -y java httpd zip unzip curl && \
-    dnf clean all
+# Install Apache
+RUN dnf -y install httpd && dnf clean all
 
-# Set working directory for web files
+# Add a simple index.html
 WORKDIR /var/www/html/
+RUN echo "<h1>Welcome to Jenkins Docker Practice!</h1>" > index.html
 
-# Download and extract the template
-RUN curl -fSL https://www.free-css.com/assets/files/free-css-templates/download/page254/photogenic.zip -o photogenic.zip && \
-    unzip -q photogenic.zip && \
-    cp -rvf photogenic/* . && \
-    rm -rf photogenic photogenic.zip
-
-# Expose ports
+# Expose HTTP port
 EXPOSE 80
 
-# Start Apache in foreground
+# Start Apache in the foreground
 CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
 
