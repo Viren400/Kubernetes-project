@@ -1,17 +1,19 @@
-FROM centos
-MAINTAINER vikash@gmail.com
-RUN cd /etc/yum.repos.d/
-RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
-RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
-RUN yum -y install java
-CMD /bin/bash
-RUN yum install -y httpd
-RUN yum install -y zip
-RUN yum install -y unzip
+FROM almalinux:8
+MAINTAINER virenlahamage@gmail.com
+
+# Update and install dependencies
+RUN dnf -y update && \
+    dnf -y install java-11-openjdk httpd zip unzip && \
+    dnf clean all
+
+# Download and extract website template
 ADD https://www.free-css.com/assets/files/free-css-templates/download/page254/photogenic.zip /var/www/html/
 WORKDIR /var/www/html/
-RUN sh -c 'unzip -q "*.zip"'
-RUN cp -rvf photogenic/* .
-RUN rm -rf photogenic photogenic.zip
-CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
+RUN unzip -q photogenic.zip && \
+    cp -rvf photogenic/* . && \
+    rm -rf photogenic photogenic.zip
+
+# Expose HTTP port and start Apache
 EXPOSE 80
+CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
+
