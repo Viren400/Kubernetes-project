@@ -1,19 +1,17 @@
-# Simple base image
-FROM almalinux:9
-
-# Maintainer info
-MAINTAINER virenlahamage2020@gmail.com
-
-# Install Apache
-RUN dnf -y install httpd && dnf clean all
-
-# Add a simple index.html
+FROM centos
+MAINTAINER vikash@gmail.com
+RUN cd /etc/yum.repos.d/
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+RUN yum -y install java
+CMD /bin/bash
+RUN yum install -y httpd
+RUN yum install -y zip
+RUN yum install -y unzip
+ADD https://www.free-css.com/assets/files/free-css-templates/download/page254/photogenic.zip /var/www/html/
 WORKDIR /var/www/html/
-RUN echo "<h1>Welcome to Jenkins Docker Practice!</h1>" > index.html
-
-# Expose HTTP port
-EXPOSE 80
-
-# Start Apache in the foreground
+RUN sh -c 'unzip -q "*.zip"'
+RUN cp -rvf photogenic/* .
+RUN rm -rf photogenic photogenic.zip
 CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
-
+EXPOSE 80
